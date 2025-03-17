@@ -2,6 +2,12 @@ package com.xebia.observability.controller;
 
 import com.xebia.observability.model.Person;
 import com.xebia.observability.service.ObservabilityService;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +22,13 @@ public class ObservabilityController {
 
     private final ObservabilityService observerService;
 
+    private static final Logger logger = LoggerFactory.getLogger(ObservabilityController.class);
+    private final Tracer tracer;
 
     @Autowired
     public ObservabilityController(ObservabilityService observerService) {
         this.observerService = observerService;
+        this.tracer = GlobalOpenTelemetry.get().getTracer("com.xebia.observability.controller");
     }
 
     @PostMapping
@@ -30,8 +39,14 @@ public class ObservabilityController {
 
     @GetMapping("/prueba")
     public String prueba() {
-        System.out.println("pruebaaaaaaaaaaaa");
-        return "ESTA VIVO!";
+        Span span = tracer.spanBuilder("prueba-endpoint")
+                .startSpan();
+        try (Scope scope = span.makeCurrent()) {
+            System.out.println("pruebaaaaaaaaaaaa");
+            return "ESTA VIVO!";
+        } finally {
+            span.end();
+        }
     }
 
     @GetMapping

@@ -1,5 +1,6 @@
+com/xebia/observability/service/ObservabilityService.class
+com/xebia/observability/controller/ObservabilityController.class
+com/xebia/observability/config/OpenTelemetryConfig.class
 com/xebia/observability/repository/UserRepository.class
 com/xebia/observability/ObservabilityApiApplication.class
-com/xebia/observability/service/ObservabilityService.class
 com/xebia/observability/model/Person.class
-com/xebia/observability/controller/ObservabilityController.class

@@ -1,14 +1,34 @@
-# Usa una imagen base con JDK 17 (Java 17)
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-slim as build
+WORKDIR /workspace/app
 
-# Establece el directorio de trabajo dentro del contenedor
-WORKDIR /app
+# Verificar primero si existen los archivos de Maven
+COPY pom.xml .
+COPY src src
 
-# Copia el archivo JAR desde el directorio 'target' de tu máquina local al contenedor
-COPY target/Observability-API-0.0.1-SNAPSHOT.jar /app/Observability-API-0.0.1-SNAPSHOT.jar
+# Si no tienes mvnw, usar Maven directamente:
+RUN apt-get update && apt-get install -y maven
+RUN mvn dependency:go-offline -B
+RUN mvn package -DskipTests
 
-# Expón el puerto en el que la aplicación Spring Boot se ejecutará
+RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+
+# Imagen final
+FROM openjdk:17-slim
+VOLUME /tmp
+
+# Exponer puerto
 EXPOSE 8080
 
-# Ejecuta el archivo JAR de la aplicación
-CMD ["java", "-jar", "Observability-API-0.0.1-SNAPSHOT.jar"]
+# Variables para jvmArguments
+ARG DEPENDENCY=/workspace/app/target/dependency
+
+# Estructura de la aplicación
+COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
+COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+
+# Punto de entrada con opciones mínimas
+ENTRYPOINT ["java", \
+            "-Djava.security.egd=file:/dev/./urandom", \
+            "-Dmanagement.metrics.enabled=false", \
+            "-cp", "app:app/lib/*", "com.xebia.observability.ObservabilityApiApplication"]

@@ -1,4 +1,5 @@
 /Users/andrespineda/Documents/ProjectsIntelliJ/observability-api/src/main/java/com/xebia/observability/ObservabilityApiApplication.java
+/Users/andrespineda/Documents/ProjectsIntelliJ/observability-api/src/main/java/com/xebia/observability/config/OpenTelemetryConfig.java
 /Users/andrespineda/Documents/ProjectsIntelliJ/observability-api/src/main/java/com/xebia/observability/controller/ObservabilityController.java
 /Users/andrespineda/Documents/ProjectsIntelliJ/observability-api/src/main/java/com/xebia/observability/model/Person.java
 /Users/andrespineda/Documents/ProjectsIntelliJ/observability-api/src/main/java/com/xebia/observability/repository/UserRepository.java
